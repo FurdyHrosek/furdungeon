@@ -23,15 +23,12 @@
 </template>
 
 <script>
-import { firestore, fireauth } from '../firebase.js';
-import { onSnapshot, collection, query } from "firebase/firestore";
+import { fireauth } from '../firebase.js';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { checkAuthState } from '../helpers/Authorization.js';
 
 export default {
-  name: 'SignUp',
-  created() {
-    this.getData();
-  },
+  name: 'Login',
   data() {
     return {
       email: '',
@@ -47,30 +44,13 @@ export default {
       }
     };
   },
+  mounted() {
+    checkAuthState();
+  },
   methods: {
-    async getData() {
-      const collectionRef = query(collection(firestore, "users"))
-      this.isUserDataLoading = true;
-
-      onSnapshot(collectionRef, (snapshot) => {
-        this.userData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        this.isUserDataLoading = false;
-      }, error => {
-        console.error(error);
-        this.isUserDataLoading = false;
-      });
-    },
-
-    async addData(formData) {
-      const collectionRef = query(collection(firestore, "users"));
-      try {
-        await collectionRef.add(formData);
-        console.log('Data Saved Successfully');
-      } catch (error) {
-        console.error(error);
-      }
-    },
-
+    /**
+     * Check firebase and login user and route to home or show error
+     */
     async loginUser() {
       signInWithEmailAndPassword(fireauth, this.email, this.password)
       .then((userCredential) => {
@@ -98,6 +78,9 @@ export default {
       });
     },
 
+    /**
+     * Register new user to firebase
+     */
     async registerUser() {
       let registerError = '';
 
@@ -120,20 +103,29 @@ export default {
 
             this.registerError = registerError;
             setTimeout(() => {
-              //this.registerError = '';
+              this.registerError = '';
             }, 5000);
           });
       } catch (error) {
         registerError = 'An error occurred while logging in. Please try again later.';
 
         this.registerError = registerError;
+        setTimeout(() => {
+            this.registerError = '';
+          }, 5000);
       }
     },
 
+    /**
+     * Sets isRegisterModalVisible condition to true
+     */
     showRegisterModal() {
       this.isRegisterModalVisible = true;
     },
 
+    /**
+     * Sets isRegisterModalVisible condition to false
+     */
     closeRegisterModal() {
       this.isRegisterModalVisible = false;
     }
