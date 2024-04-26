@@ -2,7 +2,7 @@
 </template>
   
   <script>
-  import { firestore } from '../firebase.js';
+  import { firestore } from '../../firebase.js';
   import { onSnapshot, collection, query } from "firebase/firestore";
   
   export default {

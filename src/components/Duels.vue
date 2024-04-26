@@ -1,5 +1,5 @@
 <template>
-  <Navigation></Navigation>
+<Navigation></Navigation>
 </template>
 
 <script>
@@ -7,13 +7,13 @@ import Navigation from './Navigation.vue';
 import { authorizeUser } from '../helpers/Authorization.js';
 
 export default {
-  name: 'Home',
-  components: {
+name: 'Home',
+components: {
     Navigation
-  },
-  mounted() {
+},
+mounted() {
     authorizeUser();
-  },
+},
 }
 </script>
 

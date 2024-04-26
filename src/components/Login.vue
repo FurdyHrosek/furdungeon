@@ -1,20 +1,21 @@
 <template>
-  <img class="logo" alt="Dungeon Master Logo" src="../../public/dungeon.svg">
-  <h1>Dungeon Master</h1>
+  <div class="login-header">
+    <img class="logo" alt="Dungeon Master Logo" src="../../public/dungeon.svg">
+    <h1>Dungeon Master</h1>
+  </div>
   <div class="login">
     <input v-model="email" type="text" placeholder="Email" />
-    <input v-model="password" type="password" placeholder="Password" />
-    <button class="default-btn" @click="loginUser">Login</button>
-    <button class="default-btn" @click="showRegisterModal">Register</button>
+    <input v-model="password" type="password" placeholder="Password" @keyup.enter="loginUser" />
+    <button class="default-btn login-btn" @click="loginUser">Login</button>
+    <button class="default-btn" @click="openRegisterModal">Register</button>
     <div v-if="loginError" class="login-error">{{ loginError }}</div>
 
-    <div v-if="isRegisterModalVisible" class="overlay"></div>
     <div v-if="isRegisterModalVisible" class="register-modal">
-      <h2>Register</h2>
+      <h2>Delight in Task Bondage Bliss!</h2>
       <form @submit.prevent="registerUser">
         <input type="email" id="email" placeholder="Email" v-model="registerData.email" required>
         <input type="password" id="password" placeholder="Password" v-model="registerData.password" required>
-        <button class="default-btn register-btn" type="submit">Register</button>
+        <button class="default-btn register-btn" type="submit">Enslave</button>
         <div v-if="registerError" class="register-error">{{ registerError }}</div>
         <button class="close-modal-btn" @click="closeRegisterModal">X</button>
       </form>
@@ -25,7 +26,8 @@
 <script>
 import { fireauth } from '../firebase.js';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { checkAuthState } from '../helpers/Authorization.js';
+import { authorizeUser } from '../helpers/Authorization.js';
+import { createModalFunctions } from '../helpers/Modal.js';
 
 export default {
   name: 'Login',
@@ -45,7 +47,11 @@ export default {
     };
   },
   mounted() {
-    checkAuthState();
+    authorizeUser();
+
+    const { openModal: openRegisterModal, closeModal: closeRegisterModal } = createModalFunctions(this.$data, 'isRegisterModalVisible');
+    this.openRegisterModal = openRegisterModal;
+    this.closeRegisterModal = closeRegisterModal;
   },
   methods: {
     /**
@@ -115,34 +121,23 @@ export default {
           }, 5000);
       }
     },
-
-    /**
-     * Sets isRegisterModalVisible condition to true
-     */
-    showRegisterModal() {
-      this.isRegisterModalVisible = true;
-    },
-
-    /**
-     * Sets isRegisterModalVisible condition to false
-     */
-    closeRegisterModal() {
-      this.isRegisterModalVisible = false;
-    }
   }
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 /* Logo & Header */
-.logo {
+.login-header {
+  margin-top: 80px;
+  .logo {
   width: 100px;
-}
-h1 {
-  text-transform: uppercase;
-  font-size: 44px;
-  letter-spacing: 2px;
-  color: #ff0000;
+  }
+  h1 {
+    text-transform: uppercase;
+    font-size: 44px;
+    letter-spacing: 2px;
+    color: $primary-red;
+  }
 }
 
 /* Login */
@@ -152,85 +147,97 @@ h1 {
   align-items: center;
   position: relative;
   gap: 20px;
-  margin: 50px auto 100px;
-}
-.login input {
-  display: block;
-  width: 300px;
-  height: 40px;
-  padding-left: 20px;
-  border: none;
-}
-.login .default-btn {
-  width: 320px;
-  height: 40px;
-  border: 1px solid black;
-  border-radius: 0;
-  outline: none;
-  background: black;
-  color: white;
-  transition: all 0.3s ease-in-out;
-  cursor: pointer;
-}
-.login .default-btn:hover {
-  background: #292929;
-  border: 1px solid #292929;
-}
-.login-error {
-  position: absolute;
-  max-width: 500px;
-  bottom: -70px;
-  color: #ff0000;
-  font-size: 18px;
-  text-transform: uppercase;
-}
+  margin: 50px auto 120px;
 
-/* Register Modal */
-.register-modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: #525252;
-  padding: 20px;
-  border: 1px solid #525252;
-  z-index: 1000;
-}
-.register-modal h2 {
-  color: white;
-  margin: 20px 0 30px;
-}
-.register-modal form {
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
-}
-.register-modal .register-btn {
-  margin-bottom: 80px;
-}
-.register-error {
-  position: absolute;
-  width: auto;
-  bottom: 20px;
-  padding-right: 20px;
-  color: #ff0000;
-  font-size: 18px;
-  text-transform: uppercase;
-}
-.close-modal-btn {
-  position: absolute;
-  right: 20px;
-  top: 20px;
-  font-size: 1em;
-  border: none;
-  background: none;
-  color: white;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-}
-.close-modal-btn:hover {
-  position: absolute;
-  border: none;
-  color: #a8a8a8;
+  input {
+    display: block;
+    width: 300px;
+    height: 40px;
+    padding-left: 20px;
+    border: none;
+  }
+  .default-btn {
+    width: 320px;
+    height: 40px;
+    border: 2px solid $border-gray-100;
+    border-radius: 0;
+    outline: none;
+    background: $btn-black;
+    color: $btn-white;
+    transition: $trans;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+
+    &.login-btn {
+      margin-top: 40px;
+    }
+
+    &:hover {
+      color: $btn-white-hover;
+      background: $btn-black-hover;
+      border-color: $primary-red;
+    }
+  }
+  
+  .login-error {
+    max-width: 500px;
+    padding-top: 15px;
+    color: $primary-white;
+    font-size: 18px;
+    text-transform: uppercase;
+  }
+
+  /* Register Modal */
+  .register-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: $background-gray;
+    padding: 60px 50px 40px;
+    z-index: 1000;
+
+    h2 {
+      color: white;
+      margin: 25px 0 40px;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 25px;
+
+      .register-btn {
+        margin: 50px 0 60px;
+      }
+      .register-error {
+        position: absolute;
+        width: 100%;
+        max-width: 300px;
+        bottom: 20px;
+        color: $primary-red;
+        font-size: 18px;
+        text-transform: uppercase;
+      }
+      .close-modal-btn {
+        position: absolute;
+        right: 40px;
+        top: 35px;
+        font-size: 1em;
+        border: none;
+        background: none;
+        color: $btn-white;
+        cursor: pointer;
+        transition: $trans;
+
+        &:hover {
+          position: absolute;
+          border: none;
+          color: $btn-white-hover;
+        }
+      }
+    }
+  }
 }
 </style>

@@ -1,7 +1,12 @@
 import Home from './components/Home.vue';
 import Login from './components/Login.vue';
+import Slave from './components/Slave.vue';
+import Obligations from './components/Obligations.vue';
+import Conflicts from './components/Conflicts.vue';
+import Duels from './components/Duels.vue';
 
 import { createRouter, createWebHistory } from 'vue-router';
+import { removeOverlay } from './helpers/Modal.js';
 
 const routes = [
     {
@@ -14,11 +19,35 @@ const routes = [
         component: Login,
         path: '/login',
     },
+    {
+        name: 'Slave',
+        component: Slave,
+        path: '/slave',
+    },
+    {
+        name: 'Obligations',
+        component: Obligations,
+        path: '/obligations',
+    },
+    {
+        name: 'Conflicts',
+        component: Conflicts,
+        path: '/conflicts',
+    },
+    {
+        name: 'Duels',
+        component: Duels,
+        path: '/duels',
+    },
 ];
 
 const router = createRouter({
     history: createWebHistory(),
     routes,
+});
+
+router.afterEach(() => {
+    removeOverlay();
 });
 
 export default router;
