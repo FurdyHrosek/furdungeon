@@ -12,7 +12,7 @@ export default {
     Navigation
   },
   created() {
-    authorizeUser();
+    //authorizeUser();
   },
 }
 </script>
