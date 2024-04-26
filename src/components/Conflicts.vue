@@ -1,5 +1,5 @@
 <template>
-<Navigation></Navigation>
+  <Navigation></Navigation>
 </template>
 
 <script>
@@ -9,10 +9,10 @@ import { authorizeUser } from '../helpers/Authorization.js';
 export default {
 name: 'Home',
 components: {
-    Navigation
+  Navigation
 },
-mounted() {
-    authorizeUser();
+created() {
+  authorizeUser();
 },
 }
 </script>

@@ -8,13 +8,13 @@ import Navigation from './Navigation.vue';
 import { authorizeUser } from '../helpers/Authorization.js';
 
 export default {
-name: 'Obligations',
-components: {
-  Navigation
-},
-mounted() {
-  authorizeUser();
-},
+  name: 'Obligations',
+  components: {
+    Navigation
+  },
+  created() {
+    authorizeUser();
+  },
 }
 </script>
 

@@ -98,7 +98,7 @@ export default {
   display: flex;
   height: 100%;
   z-index: 1010;
-  left: -400px;
+  left: -250px;
   transition: $trans;
 
   &.open {

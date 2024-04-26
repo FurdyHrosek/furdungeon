@@ -12,6 +12,14 @@ export const createModalFunctions = (data, isVisibleState) => {
       document.body.insertBefore(overlay, document.body.firstChild);
 
       data[isVisibleState] = true;
+
+      const closeModalOnEscape = (event) => {
+        if (event.key === 'Escape') {
+          closeModal();
+        }
+      };
+  
+      document.addEventListener('keydown', closeModalOnEscape);
   };
   
   const closeModal = () => {

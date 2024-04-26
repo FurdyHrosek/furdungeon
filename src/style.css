@@ -56,6 +56,10 @@ input:focus-visible {
   height: 100%;
 }
 
+#page {
+  padding: 100px 100px;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

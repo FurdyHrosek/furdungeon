@@ -6,6 +6,7 @@ import Conflicts from './components/Conflicts.vue';
 import Duels from './components/Duels.vue';
 
 import { createRouter, createWebHistory } from 'vue-router';
+import { authorizeUser } from './helpers/Authorization.js';
 import { removeOverlay } from './helpers/Modal.js';
 
 const routes = [
@@ -46,8 +47,15 @@ const router = createRouter({
     routes,
 });
 
-router.afterEach(() => {
-    removeOverlay();
+
+/**
+ * Init routing to unique paths (non-current).
+ */
+router.afterEach((to, from) => {
+    if (to.name !== from.name) {
+        removeOverlay();
+    }
 });
+
 
 export default router;
