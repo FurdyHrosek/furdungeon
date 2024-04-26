@@ -99,6 +99,7 @@ export default {
             const user = userCredential.user;
             this.isRegisterModalVisible = false;
             removeOverlay();
+            this.$router.push({name: 'Home'})
           })
           .catch((error) => {
             console.error(error.code + ' | ' + error.message);
