@@ -7,7 +7,7 @@
     <input v-model="email" type="text" placeholder="Email" />
     <input v-model="password" type="password" placeholder="Password" @keyup.enter="loginUser" />
     <button class="default-btn login-btn" @click="loginUser">Login</button>
-    <button class="default-btn" @click="openRegisterModal">Register</button>
+    <button class="default-btn" data-open="modal" @click="openRegisterModal">Register</button>
     <div v-if="loginError" class="login-error">{{ loginError }}</div>
 
     <div v-if="isRegisterModalVisible" class="register-modal">
@@ -27,7 +27,7 @@
 import { fireauth } from '../firebase.js';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { authorizeUser } from '../helpers/Authorization.js';
-import { createModalFunctions } from '../helpers/Modal.js';
+import { createModalFunctions, removeOverlay } from '../helpers/Modal.js';
 
 export default {
   name: 'Login',
@@ -46,9 +46,10 @@ export default {
       }
     };
   },
-  mounted() {
+  created() {
     authorizeUser();
-
+  },
+  mounted() {
     const { openModal: openRegisterModal, closeModal: closeRegisterModal } = createModalFunctions(this.$data, 'isRegisterModalVisible');
     this.openRegisterModal = openRegisterModal;
     this.closeRegisterModal = closeRegisterModal;
@@ -97,6 +98,7 @@ export default {
           .then((userCredential) => {
             const user = userCredential.user;
             this.isRegisterModalVisible = false;
+            removeOverlay();
           })
           .catch((error) => {
             console.error(error.code + ' | ' + error.message);
@@ -158,7 +160,7 @@ export default {
   }
   .default-btn {
     width: 320px;
-    height: 40px;
+    height: 50px;
     border: 2px solid $border-gray-100;
     border-radius: 0;
     outline: none;
@@ -196,7 +198,7 @@ export default {
     transform: translate(-50%, -50%);
     background-color: $background-gray;
     padding: 60px 50px 40px;
-    z-index: 1000;
+    z-index: 201;
 
     h2 {
       color: white;
@@ -215,7 +217,7 @@ export default {
         position: absolute;
         width: 100%;
         max-width: 300px;
-        bottom: 20px;
+        bottom: 25px;
         color: $primary-red;
         font-size: 18px;
         text-transform: uppercase;

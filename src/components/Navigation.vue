@@ -1,10 +1,9 @@
 <template>
-<div class="nav-helpers" 
-     v-bind:class="{ 'nav-open': isNavigationVisible }" 
-     @click="isNavigationVisible ? closeNavigation() : openNavigation()"
-     >
-    <i class="nav-helper">{{ isNavigationVisible ? '< < <' : '> > >' }}</i>
-</div>
+  <button class="nav-helper" data-open="navigation"
+          :class="{ 'nav-open': isNavigationVisible }" 
+          @click="toggleNavigation">
+    {{ isNavigationVisible ? '< < <' : '> > >' }}
+  </button>
   <div id="nav" v-bind:class="{ 'open': isNavigationVisible }">
     <ul id="nav-links">
       <li><router-link to="/">Dungeon</router-link></li>
@@ -13,7 +12,7 @@
       <li><router-link to="/conflicts">Conflicts</router-link></li>
       <li><router-link to="/duels">Duels</router-link></li>
     </ul>
-    <button class="logout-btn" @click="openLogoutModal">Escape</button>
+    <button class="logout-btn" data-open="modal" @click="openLogoutModal">Escape</button>
   </div>
 
   <div v-if="isLogoutModalVisible" class="logout">
@@ -35,7 +34,7 @@ export default {
   data() {
     return {
       isLogoutModalVisible: false,
-      isNavigationVisible: false
+      isNavigationVisible: false,
     };
   },
   mounted() {
@@ -43,14 +42,13 @@ export default {
     this.openLogoutModal = openLogoutModal;
     this.closeLogoutModal = closeLogoutModal;
 
-    const { openModal: openNavigation, closeModal: closeNavigation } = createModalFunctions(this.$data, 'isNavigationVisible');
-    this.openNavigation = openNavigation;
-    this.closeNavigation = closeNavigation;
+    const { toggleModal: toggleNavigation } = createModalFunctions(this.$data, 'isNavigationVisible');
+    this.toggleNavigation = toggleNavigation;
   },
   methods: {
     async logout() {
       signOut(fireauth).then(() => {
-        // Sign-out successful.
+        document.body.classList.remove('logged');
       }).catch((error) => {
         // An error happened.
       });
@@ -60,45 +58,39 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.nav-helpers {
+.nav-helper {
   position: fixed;
   display: flex;
   justify-content: flex-end;
-  color: $primary-white;
-  text-transform: uppercase;
+  z-index: 102;
+
   width: 222px;
+  left: -140px;
+  margin-top: 25px;
 
+  background: none;
   font-size: 26px;
-  color: white;
-
-  z-index: 1011;
+  color: $primary-red;
+  letter-spacing: -6px;
+  text-transform: uppercase;
+  border: 0;
+  cursor: pointer;
+  transition: $trans;
 
   &.nav-open {
-    .nav-helper {
-      right: 0;
-    }
+    left: -20px;
   }
 
-  .nav-helper {
-    position: absolute;
-    cursor: pointer;
-    transition: $trans;
-    margin: 15px 30px 0 0;
-    letter-spacing: -6px;
-    color: $primary-red;
-    right: 120px;
-
-    &:hover {
-      color: $secondary-red;
-    }
+  &:hover {
+    color: $secondary-red;
   }
 }
 #nav {
   position: fixed;
   display: flex;
   height: 100%;
-  z-index: 1010;
-  left: -400px;
+  z-index: 101;
+  left: -250px;
   transition: $trans;
 
   &.open {
@@ -174,12 +166,14 @@ export default {
 
 .logout {
   position: fixed;
+  max-width: 450px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   background: linear-gradient(to bottom, $gradient-dark, $gradient-light);
+  box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
   padding: 40px 20px;
-  z-index: 1000;
+  z-index: 201;
 
   h2 {
     color: $primary-white;
