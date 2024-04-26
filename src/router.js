@@ -6,7 +6,7 @@ import Conflicts from './components/Conflicts.vue';
 import Duels from './components/Duels.vue';
 
 import { createRouter, createWebHistory } from 'vue-router';
-import { authorizeUser } from './helpers/Authorization.js';
+import { fireauth } from './firebase.js';
 import { removeOverlay } from './helpers/Modal.js';
 
 const routes = [
@@ -47,6 +47,13 @@ const router = createRouter({
     routes,
 });
 
+router.beforeEach((to, from, next) => {
+    if (to.name === 'Login' && fireauth.currentUser) {
+        next(false);
+    } else {
+        next();
+    }
+});
 
 /**
  * Init routing to unique paths (non-current).

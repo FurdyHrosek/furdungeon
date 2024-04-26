@@ -7,7 +7,7 @@
     <input v-model="email" type="text" placeholder="Email" />
     <input v-model="password" type="password" placeholder="Password" @keyup.enter="loginUser" />
     <button class="default-btn login-btn" @click="loginUser">Login</button>
-    <button class="default-btn" @click="openRegisterModal">Register</button>
+    <button class="default-btn" data-open="modal" @click="openRegisterModal">Register</button>
     <div v-if="loginError" class="login-error">{{ loginError }}</div>
 
     <div v-if="isRegisterModalVisible" class="register-modal">
@@ -198,7 +198,7 @@ export default {
     transform: translate(-50%, -50%);
     background-color: $background-gray;
     padding: 60px 50px 40px;
-    z-index: 1000;
+    z-index: 201;
 
     h2 {
       color: white;

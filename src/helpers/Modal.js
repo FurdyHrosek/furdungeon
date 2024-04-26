@@ -5,27 +5,36 @@ export const removeOverlay = () => {
   }
 }
 
-export const createModalFunctions = (data, isVisibleState) => {
-  const openModal = () => {
-      const overlay = document.createElement('div');
-      overlay.className = 'overlay';
-      document.body.insertBefore(overlay, document.body.firstChild);
+export const createModalFunctions = (data, isModalVisible) => {
+  const openModal = (event) => {
+    const overlay = document.createElement('div');
+    const overlayClass = event.target.dataset.open + '-overlay';
+    overlay.classList.add('overlay', overlayClass);
+    document.body.insertBefore(overlay, document.body.firstChild);
 
-      data[isVisibleState] = true;
+    data[isModalVisible] = true;
 
-      const closeModalOnEscape = (event) => {
-        if (event.key === 'Escape') {
-          closeModal();
-        }
-      };
-  
-      document.addEventListener('keydown', closeModalOnEscape);
+    const closeModalOnEscape = (event) => {
+      if (event.key === 'Escape') {
+        closeModal();
+      }
+    };
+
+    document.addEventListener('keydown', closeModalOnEscape);
   };
-  
+
   const closeModal = () => {
     removeOverlay();
-    data[isVisibleState] = false;
+    data[isModalVisible] = false;
   };
-  
-  return { openModal, closeModal };
+
+  const toggleModal = (event) => {
+    if (data[isModalVisible]) {
+      closeModal();
+    } else {
+      openModal(event);
+    }
+  };
+
+  return { openModal, closeModal, toggleModal };
 };
