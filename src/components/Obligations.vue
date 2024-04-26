@@ -53,7 +53,6 @@ export default {
   methods: {
     async createTask() {
       try {
-        // Call addData function to add new task to Firestore
         await addData(['task-' + Math.floor(Math.random() * 10000000000)], {
           name: this.newTaskData.name,
           description: this.newTaskData.description
@@ -62,18 +61,12 @@ export default {
         console.log(this.newTaskData.name)
         console.log(this.newTaskData.description)
 
-        // Reset newTaskData after successfully adding the task
         this.newTaskData.name = '';
         this.newTaskData.description = '';
 
-
-
-        // Close the new task modal
         this.closeNewTaskModal();
       } catch (error) {
-        // Handle any errors
         console.error('Error adding task:', error);
-        // You can also set an error message here to display in the UI
       }
     }
   }

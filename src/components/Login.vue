@@ -124,6 +124,21 @@ export default {
           }, 5000);
       }
     },
+
+    async forgottenPassword() {
+      let registerError = '';
+
+      sendPasswordResetEmail(fireauth, email)
+      .then(() => {
+        // Password reset email sent!
+        // ..
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        // ..
+      });
+    },
   }
 }
 </script>
