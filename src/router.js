@@ -47,16 +47,19 @@ const router = createRouter({
     routes,
 });
 
+/**
+ * Init functions before routing to unique paths (non-current).
+ */
 router.beforeEach((to, from, next) => {
     if (to.name === 'Login' && fireauth.currentUser) {
-        next(false);
+      next('/home');
     } else {
-        next();
+      next();
     }
-});
+  });
 
 /**
- * Init routing to unique paths (non-current).
+ * Init functions after routing to unique paths (non-current).
  */
 router.afterEach((to, from) => {
     if (to.name !== from.name) {
