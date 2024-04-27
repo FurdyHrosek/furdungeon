@@ -7,6 +7,7 @@
     <input v-model="email" type="text" placeholder="Email" />
     <input v-model="password" type="password" placeholder="Password" @keyup.enter="loginUser" />
     <button class="default-btn login-btn" @click="loginUser">Login</button>
+    <button class="default-btn" data-open="modal" @click="openForgottenModal">Forgotten</button>
     <button class="default-btn" data-open="modal" @click="openRegisterModal">Register</button>
     <div v-if="loginError" class="login-error">{{ loginError }}</div>
 
@@ -20,12 +21,23 @@
         <button class="close-modal-btn" @click="closeRegisterModal">X</button>
       </form>
     </div>
+
+    <div v-if="isForgottenModalVisible" class="forgotten-modal">
+      <h2>Honor Your Thrall's Essential Requirements!</h2>
+      <form @submit.prevent="forgottenPassword">
+        <input type="email" id="forgotten-email" placeholder="Email" v-model="forgottenEmail" required>
+        <button class="default-btn forgotten-btn" type="submit">Send Reminder</button>
+        <div v-if="forgottenMessage" class="forgotten-message">{{ forgottenMessage }}</div>
+        <button class="close-modal-btn" @click="closeForgottenModal">X</button>
+      </form>
+    </div>
+    
   </div>
 </template>
 
 <script>
 import { fireauth } from '../firebase.js';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail  } from "firebase/auth";
 import { authorizeUser } from '../helpers/Authorization.js';
 import { createModalFunctions, removeOverlay } from '../helpers/Modal.js';
 
@@ -36,14 +48,15 @@ export default {
       email: '',
       password: '',
       loginError: '',
+      forgottenEmail: '',
+      forgottenMessage: '',
+      isForgottenModalVisible: false,
       registerError: '',
-      isUserDataLoading: true,
-      userData: null,
       isRegisterModalVisible: false,
       registerData: {
         email: '',
         password: ''
-      }
+      },
     };
   },
   created() {
@@ -53,6 +66,10 @@ export default {
     const { openModal: openRegisterModal, closeModal: closeRegisterModal } = createModalFunctions(this.$data, 'isRegisterModalVisible');
     this.openRegisterModal = openRegisterModal;
     this.closeRegisterModal = closeRegisterModal;
+
+    const { openModal: openForgottenModal, closeModal: closeForgottenModal } = createModalFunctions(this.$data, 'isForgottenModalVisible');
+    this.openForgottenModal = openForgottenModal;
+    this.closeForgottenModal = closeForgottenModal;
   },
   methods: {
     /**
@@ -96,9 +113,9 @@ export default {
         
         createUserWithEmailAndPassword(fireauth, email, password)
           .then((userCredential) => {
+            removeOverlay();
             const user = userCredential.user;
             this.isRegisterModalVisible = false;
-            removeOverlay();
             this.$router.push({name: 'Home'})
           })
           .catch((error) => {
@@ -117,26 +134,35 @@ export default {
           });
       } catch (error) {
         registerError = 'An error occurred while logging in. Please try again later.';
-
         this.registerError = registerError;
+
         setTimeout(() => {
-            this.registerError = '';
-          }, 5000);
+          this.registerError = '';
+        }, 5000);
       }
     },
 
+    /**
+     * Send forgotten password to user email.
+     */
     async forgottenPassword() {
-      let registerError = '';
+      let forgottenMessage = '';
 
-      sendPasswordResetEmail(fireauth, email)
-      .then(() => {
-        // Password reset email sent!
-        // ..
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // ..
+      sendPasswordResetEmail(fireauth, this.forgottenEmail)
+        .then(() => {
+          forgottenMessage = 'New password request was sent to your e-mail.'
+          this.forgottenMessage = forgottenMessage;
+
+          setTimeout(() => {
+            forgottenMessage = ''
+            this.forgottenMessage = forgottenMessage;
+
+            removeOverlay();
+            this.closeForgottenModal();
+          }, 5000)
+        })
+        .catch((error) => {
+          console.error(error)
       });
     },
   }
@@ -206,19 +232,27 @@ export default {
     text-transform: uppercase;
   }
 
-  /* Register Modal */
-  .register-modal {
+  /* Register & Forgotten Modal */
+  .register-modal,
+  .forgotten-modal {
     position: fixed;
+    z-index: 201;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: $background-gray;
     padding: 60px 50px 40px;
-    z-index: 201;
+
+    background-color: $background-gray;
 
     h2 {
       color: white;
       margin: 25px 0 40px;
+      max-width: 300px;
     }
     form {
       display: flex;
@@ -226,10 +260,12 @@ export default {
       align-items: center;
       gap: 25px;
 
-      .register-btn {
-        margin: 50px 0 60px;
+      .register-btn,
+      .forgotten-btn {
+        margin: 30px 0 60px;
       }
-      .register-error {
+      .register-error,
+      .forgotten-message {
         position: absolute;
         width: 100%;
         max-width: 300px;
