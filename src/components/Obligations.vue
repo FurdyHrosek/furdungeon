@@ -104,7 +104,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .new-task-modal {
   position: fixed;
     z-index: 201;
