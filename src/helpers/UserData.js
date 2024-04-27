@@ -1,38 +1,24 @@
 import { firestore } from '../firebase.js';
-import { onSnapshot, collection, query } from "firebase/firestore";
-
-let isUserDataLoading = false;
-let userData = null;
+import { collection, query, getDocs, addDoc } from "firebase/firestore";
 
 /**
  * Retrieves user data from Firestore.
  */
-export async function getData() {
-  const collectionRef = query(collection(firestore, "userData"));
-  isUserDataLoading = true;
-
-  onSnapshot(collectionRef, (snapshot) => {
-    userData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    isUserDataLoading = false;
-  }, error => {
-    console.error(error);
-    isUserDataLoading = false;
+export async function getData(id, path) {
+  const querySnapshot = await getDocs(collection(firestore, "users", id, path));
+  const tasks = [];
+  querySnapshot.forEach((doc) => {
+    tasks.push(doc.data());
   });
+  return tasks;
 }
 
 /**
  * Adds data to Firestore.
  * @param {string[]} path - The path to the collection/document where data will be added.
  */
-export async function addData(path) {
-  const collectionRef = query(collection(firestore, "userData"), ...path);
-
-  try {
-    await collectionRef.add(formData);
-    console.log('Data saved successfully');
-  } catch (error) {
-    console.error(error);
-  }
+export async function addData(id, path, formData) {
+  const docRef = await addDoc(collection(firestore, 'users', id, path), {...formData});
 }
 
 /**

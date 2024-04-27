@@ -3,6 +3,25 @@
   <h1>Fulfill your obligations to the brotherhood!</h1>
   <button class="default-btn" data-open="modal" @click="openNewTaskModal">New Task</button>
 
+  <div class="obligations">
+    <h2>Tasks</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(task, index) in tasks" :key="index">
+          <td>{{ task.taskData.name }}</td>
+          <td>{{ task.taskData.description }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
   <div v-if="isNewTaskModalVisible" class="new-task-modal">
       <h2>New Task</h2>
       <form id="new-task" @submit.prevent="createTask">
@@ -18,19 +37,21 @@
 <script>
 import Navigation from './Navigation.vue';
 import { authorizeUser, getUserId } from '../helpers/Authorization.js';
-import { addData } from '../helpers/UserData.js';
+import { getData, addData } from '../helpers/UserData.js';
 import { createModalFunctions } from '../helpers/Modal.js';
 
 export default {
   name: 'Obligations',
   data() {
     return {
-      userId: null, // Initialize userId as null
+      user: null,
       isNewTaskModalVisible: false,
       newTaskData: {
+        userId: '',
         name: '',
         description: ''
       },
+      tasks: {},
     };
   },
   components: {
@@ -39,32 +60,42 @@ export default {
   async mounted() {
     try {
       await authorizeUser();
-      this.userId = await getUserId(); 
-      console.log(this.userId);
+      this.user = await getUserId(); 
+      this.getTasks();
     } catch (error) {
       console.error(error);
     }
-  },
-  mounted() {
+
     const { openModal: openNewTaskModal, closeModal: closeNewTaskModal } = createModalFunctions(this.$data, 'isNewTaskModalVisible');
     this.openNewTaskModal = openNewTaskModal;
     this.closeNewTaskModal = closeNewTaskModal;
   },
   methods: {
+    async getTasks() {
+      try {
+        const tasks = await getData(this.user, 'userTasks');
+        this.tasks = tasks;
+        console.log(this.tasks);
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
+      }
+    },
+
     async createTask() {
       try {
-        await addData(['task-' + Math.floor(Math.random() * 10000000000)], {
-          name: this.newTaskData.name,
-          description: this.newTaskData.description
+        await addData(this.user, 'userTasks', {
+          user: this.user,
+          taskData: {
+            name: this.newTaskData.name,
+            description: this.newTaskData.description
+          }
         });
-
-        console.log(this.newTaskData.name)
-        console.log(this.newTaskData.description)
 
         this.newTaskData.name = '';
         this.newTaskData.description = '';
 
         this.closeNewTaskModal();
+        this.getTasks();
       } catch (error) {
         console.error('Error adding task:', error);
       }
@@ -73,8 +104,20 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .new-task-modal {
   position: fixed;
+    z-index: 201;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 60px 50px 40px;
+
+    background-color: $background-gray;
 }
 </style>
