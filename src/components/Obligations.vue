@@ -1,34 +1,30 @@
 <template>
   <Navigation></Navigation>
   <h1>Fulfill your obligations to the brotherhood!</h1>
-  <button class="default-btn" data-open="modal" @click="openNewTaskModal">New Task</button>
+  <div class="obligations-buttons">
+    <button class="default-btn open-new-task-btn" data-open="modal" @click="openNewTaskModal">New Obligation</button>
+    <button class="default-btn open-chore-btn" data-open="modal">New Chore</button>
+  </div>
 
   <div class="obligations">
-    <h2>Tasks</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(task, index) in tasks" :key="index">
-          <td>{{ task.taskData.name }}</td>
-          <td>{{ task.taskData.description }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <h2>Obligations</h2>
+    <div class="obligations-container">
+      <div class="obligation" v-for="(task, index) in tasks" :key="index">
+      <span class="obligation-name">{{ task.taskData.name }}</span>
+      <span class="obligation-desc">{{ task.taskData.description }}</span>
+    </div>
+    </div>
   </div>
 
 
   <div v-if="isNewTaskModalVisible" class="new-task-modal">
-      <h2>New Task</h2>
       <form id="new-task" @submit.prevent="createTask">
-        <input type="name" id="new-task-name" placeholder="Duty Name" v-model="newTaskData.name" required>
-        <input type="description" id="description" placeholder="Duty Description" v-model="newTaskData.description">
-        <button class="default-btn register-btn" type="submit">Delegate</button>
-        <div v-if="newTaskError" class="register-error">{{ newTaskError }}</div>
+        <h3>Duty Name:</h3>
+        <input type="name" id="new-task-name" v-model="newTaskData.name" required>
+        <h3>Duty Description:</h3>
+        <textarea type="description" id="new-task-desc" v-model="newTaskData.description"></textarea>
+        <button class="default-btn new-task-btn" type="submit">Delegate</button>
+        <div v-if="newTaskError" class="new.task-error">{{ newTaskError }}</div>
         <button class="close-modal-btn" @click="closeNewTaskModal">X</button>
       </form>
     </div>
@@ -105,19 +101,122 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+h1 {
+  margin: 40px 0;
+  color: white;
+  text-transform: uppercase;
+}
+
+.obligations-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+
+  .default-btn {
+    width: 250px;
+    color: $primary-red;
+    border: 0;
+    background: none;
+    font-size: 24px;
+    transition: $trans;
+    text-transform: uppercase;
+    cursor: pointer;
+
+    &:hover {
+      color: $secondary-red;
+    }
+  }
+}
+
+.obligations {
+  margin-top: 40px;
+  padding: 20px;
+
+  background-color: #525252;
+  color: $primary-white;
+  .obligations-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    gap: 20px;
+
+    .obligation {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      border: 2px solid $primary-black;
+      padding: 30px 15px;
+      gap: 20px;
+
+      &-name {
+        font-size: 15px;
+        text-transform: uppercase;
+      }
+      &-desc {
+        font-size: 11px;
+      }
+    }
+  }
+}
 .new-task-modal {
   position: fixed;
-    z-index: 201;
+  z-index: 201;
+  overflow-y: visible;
 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 60px 50px 40px;
+
+  background-color: $background-gray;
+
+  #new-task {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    gap: 15px;
 
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    padding: 60px 50px 40px;
+    h3 {
+      color: $primary-white;
+      font-size: 18px;
+      text-transform: uppercase;
+    }
 
-    background-color: $background-gray;
+    input,
+    textarea {
+      width: 420px;
+      padding: 20px;
+    }
+
+    input {
+      min-height: 15px;
+    }
+    textarea {
+      min-height: 250px;
+    }
+    .new-task-btn {
+      width: 100%;
+      height: 50px;
+      margin-top: 30px;
+      border: 2px solid $border-gray-100;
+      border-radius: 0;
+      outline: none;
+      background: $btn-black;
+      color: $btn-white;
+      transition: $trans;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+
+      &:hover {
+        color: $btn-white-hover;
+        background: $btn-black-hover;
+        border-color: $primary-red;
+      }
+    }
+  }
 }
 </style>

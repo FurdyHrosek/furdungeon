@@ -274,23 +274,6 @@ export default {
         font-size: 18px;
         text-transform: uppercase;
       }
-      .close-modal-btn {
-        position: absolute;
-        right: 40px;
-        top: 35px;
-        font-size: 1em;
-        border: none;
-        background: none;
-        color: $btn-white;
-        cursor: pointer;
-        transition: $trans;
-
-        &:hover {
-          position: absolute;
-          border: none;
-          color: $btn-white-hover;
-        }
-      }
     }
   }
 }
